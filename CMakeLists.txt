@@ -25,3 +25,10 @@ FILE(GLOB SOURCE_LIST "${CMAKE_SOURCE_DIR}/src/*.cpp")
 add_executable(${PROJ_NAME} ${SOURCE_LIST} ${HEADER_LIST})
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJ_NAME})
 
+find_package(OpenCV REQUIRED)
+
+if(OpenCV_FOUND)
+    include_directories(${OpenCV_INCLUDE_DIRS})
+    target_link_libraries(${PROJ_NAME} ${OpenCV_LIBS})
+endif()
+

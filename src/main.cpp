@@ -10,22 +10,28 @@
 #include <sys/socket.h> 
 #include <unistd.h>
 // #include<windows.h>
+#include <opencv2/opencv.hpp>
 using namespace std;
+using namespace cv;
 
 #define DEBUG
 // #define CHROM
+#define DRAW
+
+Mat srcImage;
+vector<Point> drawPoint;
  
 const int CUS_MAXN = 100;
 const double pi = acos(-1);
 const int VEH_MAX = 10;
-const int INF=1<<30;
+const int INF = 1 << 30;
  
-int generation=100000;	//代数 
-double mutate_p_swap=600;   //1---1000 
-double mutate_p_rev=20; //1---1000
-double mutate_p_shift=800;
-const int PRO=10000; 	//变异概率的分母 
-//const string NAME="A-n33-k6.vrp";
+int generation = 100000;	//代数 
+double mutate_p_swap = 600;   //1---1000 
+double mutate_p_rev = 20; //1---1000
+double mutate_p_shift = 800;
+const int PRO = 10000; 	//变异概率的分母 
+// const string NAME="A-n33-k6.vrp";
  
 class Customer {
 public:
@@ -52,7 +58,7 @@ public:
 	double length;
 	int cap;
 	int cap_remain;
- 
+
 	void clear();
 	bool push(int c); // 输入的是顾客的index
  
@@ -125,6 +131,8 @@ double get_dis(double, double);
 void get_d();
  
 bool ini_data();
+
+// void draw_picture();
  
  
 //输入坐标返回极坐标
@@ -192,7 +200,7 @@ bool ini_data() {
 		getline(in, s);
 		is.str(s); is.clear();
 		is >> cus_num;
-		// cout << "cus_num = " << cus_num << endl;
+		cout << "cus_num = " << cus_num << endl;
 
 		getline(in, s);
 		is.str(s); is.clear();
@@ -212,11 +220,13 @@ bool ini_data() {
 		is.str(s); is.clear();
 		is >> t;
 		is >> x >> y;
+		drawPoint.push_back(Point(x*7, y*7));
 		for (int i = 0; i < cus_num-1; i++) {
 			getline(in, s);
 			is.str(s); is.clear();
 			is >> t;
 			is >> cus[i].x >> cus[i].y; //求出各个点的相对坐标
+			drawPoint.push_back(Point(cus[i].x*7, cus[i].y*7));
 			cus[i].x -= x;
 			cus[i].y -= y;
 			cus[i].polar = get_polar(cus[i].x, cus[i].y);
@@ -224,6 +234,7 @@ bool ini_data() {
 			cout << t << "\t" << cus[i].x << "\t" << cus[i].y << endl;
 			#endif
 			cus[i].distance = get_dis(cus[i].x, cus[i].y);
+			
 		}
  
 		getline(in, s);
@@ -266,44 +277,49 @@ void ini_popul(){
 	//srand((unsigned)time(NULL)); 
 	
 	int num;
-	int p=0;
+	int p = 0;
 	//cout<<popul_size<<endl;
 	
 	//for(int i=0;i<popul_size;){
-	for(int i=0;i<popul_size/2;){
-		num=rand()%cus_num;
+	for(int i=0;i<popul_size/2;)
+	{
+		num = rand()%cus_num;
 		//cout<<num<<endl;
-		p=0;
-		bool f=false;
-		for (int j=0;j<veh_num;j++){
+		p = 0;
+		bool f = false;
+		for (int j=0 ; j<veh_num ; j++)
+		{
 			popul[i].veh[j].clear();
 		}
-		for (int j=0;j<cus_num;){
-			int k=(num+j)%cus_num;
-			//cout<<k<<veh_num<<endl;
-			//cout<<"v[i].cap"<<popul[i].veh[p].cap_remain<<endl;
-			if (p>=veh_num){
+		for (int j=0 ; j<cus_num;)
+		{
+			int k = (num+j)%cus_num;
+			// cout<<k<<veh_num<<endl;
+			// cout<<"v[i].cap"<<popul[i].veh[p].cap_remain<<endl;
+			if (p >= veh_num)
+			{
 				//cout<<"veh_num"<<p;
 				//p=0;
 				f=false;
 				break;
 			}
-			if (popul[i].veh[p].push(k)) {
+			if (popul[i].veh[p].push(k)) 
+			{
 				//cout<<"remain: "<<popul[i].veh[p].cap_remain<<endl; 
-				popul[i].chromosome[k]=p;
-				if (p==veh_num-1){
-					f=true;
+				popul[i].chromosome[k] = p;
+				if (p == veh_num-1){
+					f = true;
 				}
-				j++;	
+				j++;
 			}
 			else p++;
 		}
 		//cout<<p<<endl;
 		if (f){
 			popul[i].update();
-		//	cout<<"kkkkkkkkkk"<<endl;
+			// cout<<"kkkkkkkkkk"<<endl;
 			i++;
-			//cout<<i<<endl;
+			// cout<<i<<endl;
 		}
 		
 	//	cout<<"kk"<<endl;
@@ -810,6 +826,29 @@ double Individual::get_fit() {
 	}
 	return fitness = 1 / len;
 }
+
+// void draw_picture(){
+// 	srcImage = cv::Mat::zeros(cv::Size(700, 700), CV_8UC1);
+// 	cout << "drawPoint = " << drawPoint.size() << endl;
+// 	for(int i=0 ; i<drawPoint.size() ; i++)
+// 	{
+// 		cv::circle(srcImage, drawPoint[i], 3, Scalar(255,255,255), -1, LINE_AA);
+// 	}
+// 	int i=0, j=0;
+// 	// for (i=0;i<veh_num;i++)
+// 	// {
+// 		line(srcImage, drawPoint[0], drawPoint[best.veh[i].cus_vec[0]+1], Scalar(255,255,255), 3);
+// 		for (j=0;j<best.veh[i].cus_vec.size()-1;j++)
+// 		{
+// 			// cout<<" "<<best.veh[i].cus_vec[j]<<" ";
+// 			line(srcImage, drawPoint[best.veh[i].cus_vec[j]+1], drawPoint[best.veh[i].cus_vec[j]+2], Scalar(255,255,255), 7);
+// 		};
+// 		line(srcImage, drawPoint[best.veh[i].cus_vec[j]+2], drawPoint[0], Scalar(255,255,255), 7);
+// 	// }
+// 	imshow("点位图", srcImage);
+// 	waitKey(0);
+// }
+
 /// 
 int main(){
 	if(!ini_data()){
@@ -818,11 +857,11 @@ int main(){
 	}
 	srand((unsigned)time(0)); 
 	#ifdef DEBUG
-	cout<<"veh_num = "<<veh_num<<endl;
-	cout<<"cus_num = "<<cus_num<<endl;
-	cout<<"CAP = "<<CAP<<endl;
-	cout<<"optimal = "<<opt_dis<<endl;
-	cout<<"tightness = "<<tightness<<endl;
+	cout << "veh_num = " << veh_num << endl;
+	cout << "cus_num = " << cus_num << endl;
+	cout << "CAP = " << CAP << endl;
+	cout << "optimal = " << opt_dis << endl;
+	cout << "tightness = " << tightness << endl;
 	#endif
 
 	//计算出初始解
@@ -875,4 +914,5 @@ int main(){
 	}*/
 	if (best.fitness==0) cout<<"000"<<endl;
 	else cout<<1/(best.fitness)<<endl;
+	// draw_picture();
 } 
