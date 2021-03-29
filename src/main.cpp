@@ -15,7 +15,7 @@ using namespace std;
 using namespace cv;
 
 #define DEBUG
-// #define CHROM
+#define CHROM
 #define DRAW
 
 Mat srcImage;
@@ -43,7 +43,6 @@ public:
 	Customer(int, int, int);
  
 	bool operator<(const Customer&) const;
- 
 	// double operator-(const Customer&);
 };
  
@@ -138,29 +137,36 @@ bool ini_data();
 //输入坐标返回极坐标
 double get_polar(double x, double y) {
 	double polar;
-	if (x > 0 && y >= 0) {
+	if (x > 0 && y >= 0) 
+	{
 		return polar = atan(1.0 * y / x);
 	}
-	if (x == 0) {
+	if (x == 0) 
+	{
 		if (y > 0) return polar = pi / 2;
 		else return polar = 3 * pi / 2;
 	}
-	if (x < 0 && y >= 0) {
+	if (x < 0 && y >= 0) 
+	{
 		return polar = pi - atan(-1.0 * y / x);
 	}
-	if (x < 0 && y < 0) {
+	if (x < 0 && y < 0) 
+	{
 		return polar = pi + atan(1.0 * y / x);
 	}
-	if (x > 0 && y < 0) {
+	if (x > 0 && y < 0) 
+	{
 		return polar = 3 * pi / 2 + atan(-1.0 * x / y);
 	}
 }
 
-double get_dis(double x, double y) {
+double get_dis(double x, double y) 
+{
 	return sqrt(x * x + y * y);
 }
  
-double get_dis_of_cus(const Customer& a, const Customer& b) {
+double get_dis_of_cus(const Customer& a, const Customer& b) 
+{
 	return sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
 }
  
@@ -180,7 +186,8 @@ void get_d() {
 		}
 	}
 }
- 
+
+//读取文件中的数据
 bool ini_data() {
 	ifstream in("../data/A-n33-k5.vrp");
 	//ifstream in(NAME);
@@ -280,31 +287,26 @@ void ini_popul(){
 	int p = 0;
 	//cout<<popul_size<<endl;
 	
-	//for(int i=0;i<popul_size;){
-	for(int i=0;i<popul_size/2;)
-	{
+	// for(int i=0;i<popul_size;){
+	for(int i=0;i<popul_size/2;) {
 		num = rand()%cus_num;
 		//cout<<num<<endl;
 		p = 0;
 		bool f = false;
-		for (int j=0 ; j<veh_num ; j++)
-		{
+		for (int j=0 ; j<veh_num ; j++){
 			popul[i].veh[j].clear();
 		}
-		for (int j=0 ; j<cus_num;)
-		{
+		for (int j=0 ; j<cus_num;){
 			int k = (num+j)%cus_num;
 			// cout<<k<<veh_num<<endl;
 			// cout<<"v[i].cap"<<popul[i].veh[p].cap_remain<<endl;
-			if (p >= veh_num)
-			{
+			if (p >= veh_num){
 				//cout<<"veh_num"<<p;
 				//p=0;
 				f=false;
 				break;
 			}
-			if (popul[i].veh[p].push(k)) 
-			{
+			if (popul[i].veh[p].push(k)) {
 				//cout<<"remain: "<<popul[i].veh[p].cap_remain<<endl; 
 				popul[i].chromosome[k] = p;
 				if (p == veh_num-1){
@@ -433,9 +435,9 @@ void evolution(){
 		int father2=selection(2);
 		Individual son[2];
 		Individual tmp;
-	//	cout<<father1<<" "<<father2<<endl; 
+		// cout<<father1<<" "<<father2<<endl; 
 		tmp=gene_two_point_crossover(father1,father2,son[0],son[1]);
-	//	cout<<"xxx"<<endl;
+		// cout<<"xxx"<<endl;
 		bool found=0;
 		for(int j=0;j<popul_size;j++){
 			if(popul[j].fitness >= tmp.fitness && popul[j].unfitness >= tmp.unfitness){
@@ -586,13 +588,16 @@ void gene_shift(Individual &ans){
  
  
  
-void gene_reverse(Individual &ans){
+void gene_reverse(Individual &ans)
+{
 	int len = cus_num;
 	int pt1 = rand() % len; //pt1: [0, cus_num-1]
 	int pt2 = rand() % len; //pt2: [0, cus_num-1]
-	if (pt1 > pt2) swap(pt1, pt2);
+	if (pt1 > pt2) 
+		swap(pt1, pt2);
 	
-	for (int i = pt1, j = pt2; i <= j; i++, j--){
+	for (int i = pt1, j = pt2; i <= j; i++, j--)
+	{
 		swap(ans.chromosome[i], ans.chromosome[j]);
 	}
 	//ans.fitness = ans.compute_fitness(ans);// gai
@@ -601,11 +606,13 @@ void gene_reverse(Individual &ans){
  
 
  
-Customer::Customer() {
+Customer::Customer() 
+{
 	x = y = demand = 0;
 }
  
-Customer::Customer(int x, int y, int d) {
+Customer::Customer(int x, int y, int d) 
+{
 	this->x = x;
 	this->y = y;
 	this->demand = d;
@@ -613,7 +620,8 @@ Customer::Customer(int x, int y, int d) {
 	distance = get_dis(x, y);
 }
  
-bool Customer::operator<(const Customer & c) const {
+bool Customer::operator<(const Customer & c) const 
+{
 	if (polar == c.polar) return distance < c.distance;
 	return polar < c.polar;
 }
@@ -621,7 +629,8 @@ bool Customer::operator<(const Customer & c) const {
  
  
  
-Vehicle::Vehicle() {
+Vehicle::Vehicle() 
+{
 	cap = CAP;
 	cap_remain = CAP;
 }
@@ -630,12 +639,14 @@ Vehicle::Vehicle() {
 Vehicle::~Vehicle() {
 }
  
-void Vehicle::clear() {
+void Vehicle::clear() 
+{
 	cus_vec.clear();
 	cap_remain = CAP;
 }
  
-bool Vehicle::push(int c) {
+bool Vehicle::push(int c) 
+{
 	if (cap_remain >= cus[c].demand) {
 		cus_vec.push_back(c);
 	//	cout<<c<<" c num and demand "<<cus[c].demand<<endl;;
@@ -655,7 +666,7 @@ bool Vehicle::push(int c) {
 		return 0;
 	}
 }
- 
+
 int Vehicle::get_num() {
 	return cus_vec.size();
 }
@@ -690,12 +701,14 @@ void Vehicle::optimate() {
 	double len_min=INF;
 	int t;
 	int min_p=0;
-//	cout<<"veh"<<endl;
-	for (int k=0;k<l;k++){
-		len_min=INF;
-		for (int i=0;i<l;i++){
+	// cout<<"veh"<<endl;
+	for (int k=0;k<l;k++)
+	{
+		len_min=INF; 
+		for (int i=0;i<l;i++)
+		{
 			t=cus_vec[i];
-			if (!isv[t]&&dis[now][t+1]<len_min){
+			if (!isv[t]&&(dis[now][t+1]<len_min)){
 				min_p=t;
 				len_min=dis[now][t+1];
 			}
@@ -707,25 +720,26 @@ void Vehicle::optimate() {
 		v.push_back(min_p);	
 	}
 //	cout<<"end"<<endl;
-	len+=dis[min_p+1][0];
-	cus_vec=v;
-	length=len;
+	len += dis[min_p+1][0];
+	cus_vec = v;
+	length = len;
 	return ;
-	/*
-	for (int i = 0; i < cus_vec.size() - 1; i++)
-	{
-		double i_x = cus[cus_vec[i]].x;
-		double i_y = cus[cus_vec[i]].y;
-		double i1_x = cus[cus_vec[i + 1]].y;
-		double i1_y = cus[cus_vec[i + 1]].y;
-		if (get_dis(i1_x, i1_y) < get_dis(i_x, i_y) / 2)
-		{
-			swap(cus_vec[i], cus_vec[i + 1]);
-		}
-	}*/
+	
+	// for (int i = 0; i < cus_vec.size() - 1; i++)
+	// {
+	// 	double i_x = cus[cus_vec[i]].x;
+	// 	double i_y = cus[cus_vec[i]].y;
+	// 	double i1_x = cus[cus_vec[i + 1]].y;
+	// 	double i1_y = cus[cus_vec[i + 1]].y;
+	// 	if (get_dis(i1_x, i1_y) < get_dis(i_x, i_y) / 2)
+	// 	{
+	// 		swap(cus_vec[i], cus_vec[i + 1]);
+	// 	}
+	// }
 }
  
-Individual::Individual() {
+Individual::Individual() 
+{
 	fitness=0;
 	unfitness=INF;
 	//cout<<"ini_indi"<<endl;
@@ -769,7 +783,7 @@ bool Individual::is_satisfy(){
 	return 1;
 }
 void Individual::update() {
-		for (int i=0;i<veh_num;i++){
+		for (int i=0 ; i<veh_num ; i++){
 			veh[i].clear();
 		}
 		/*
@@ -779,36 +793,44 @@ void Individual::update() {
 			else return 0;
 			//veh[i].get_coor();
 		}*/
-		for (int i=0;i<cus_num;i++){
+		for (int i=0 ; i<cus_num ; i++){
 			//if (veh[chromosome[i]].cap_remain>0)
 			//每次生成儿子不用判断是否合理 
 			//veh[chromosome[i]].push(i);
+			// cout << chromosome[i] << " ";
 			veh[chromosome[i]].cus_vec.push_back(i);
 			veh[chromosome[i]].cap_remain-=cus[i].demand;
 			//veh[i].get_coor();
 		}
-		for (int i=0;i<veh_num;i++){
+		// cout << endl;
+		for (int i=0 ; i<veh_num ; i++){
 			veh[i].get_coor();
 		}
 		get_ufit();
 		get_fit();
-		if (fitness>best.fitness&&unfitness==0){
-			best=*this;
+		if (fitness>best.fitness && unfitness==0)
+		{
+			best = *this;
 		}
-		sort(veh,veh+veh_num);
-		for (int i=0;i<veh_num;i++){
-			for (int j=0;j<veh[i].cus_vec.size();j++){
-				chromosome[veh[i].cus_vec[j]]=i;
+		sort(veh,veh + veh_num);
+		for (int i=0 ; i<veh_num ; i++)
+		{
+			for (int j=0 ; j<veh[i].cus_vec.size() ; j++)
+			{
+				chromosome[veh[i].cus_vec[j]] = i;
 			}
 		}
 		return ; 
 }
 
-double Individual::get_ufit() {
+double Individual::get_ufit() 
+{
 	double sum = 0;
-	for (int i = 0; i < veh_num; i++) {
+	for (int i = 0; i < veh_num; i++) 
+	{
 		//计算总超过的容量
-		if (veh[i].cap_remain < 0) {
+		if (veh[i].cap_remain < 0) 
+		{
 			sum -= veh[i].cap_remain;
 		}
 	}
@@ -853,7 +875,7 @@ double Individual::get_fit() {
 int main(){
 	if(!ini_data()){
 		cout<<"have no file"<<endl;
-		return 0;	
+		return 0;
 	}
 	srand((unsigned)time(0)); 
 	#ifdef DEBUG
@@ -870,37 +892,47 @@ int main(){
 	//显示染色体序列
 	#ifdef CHROM
 		Individual tmp;
-		tmp=popul[0];
-		for (int j=0;j<cus_num;j++){
-				cout<<tmp.chromosome[j]<<" ";
-			}
-			cout<<endl;
-		
-		for (int i=0;i<popul_size;i++){
-			for (int j=0;j<cus_num;j++){
+		tmp = popul[0];
+		cout << " 初始染色体序列" << " : ";
+		for (int j=0;j<cus_num;j++)
+		{
+			cout<<tmp.chromosome[j]<<" ";
+		}
+		cout<<endl;
+		cout<<endl;
+		for (int i=0;i<popul_size;i++)
+		{
+			for (int j=0;j<cus_num;j++)
+			{
 				cout<<popul[i].chromosome[j]<<" ";
 			}
-			cout<<endl;
+			cout<< "(" << i << ")" << endl;
 		}
 	#endif
 
 
-	for (int i=0;i<veh_num;i++){
-		for (int j=0;j<best.veh[i].cus_vec.size();j++){
+	for (int i=0 ; i<veh_num ; i++)
+	{
+		cout << "(" << i+1 << ")\t";
+		for (int j=0;j<best.veh[i].cus_vec.size();j++)
+		{
 			cout<<best.veh[i].cus_vec[j]<<" ";
 		}
 		cout<<endl;
 	}
 	if (best.fitness==0) cout<<"000"<<endl;
-	else cout<<1/(best.fitness)<<endl;
+	else cout << 1/(best.fitness) << endl;
 	cout<<endl;
 	cout<<endl;
-	//cout<<Rc<<" "<<endl;
+	cout<<"Rc = "<< Rc << " "<<endl;
 	evolution();
 	
 	//bool isv[33]={0};
-	for (int i=0;i<veh_num;i++){
-		for (int j=0;j<best.veh[i].cus_vec.size();j++){
+	for (int i=0;i<veh_num;i++)
+	{
+		cout << "(" << i+1 << ")\t";
+		for (int j=0;j<best.veh[i].cus_vec.size();j++)
+		{
 			cout<<" "<<best.veh[i].cus_vec[j]<<" ";
 		//	isv[best.veh[i].cus_vec[j]]=1;
 		}
